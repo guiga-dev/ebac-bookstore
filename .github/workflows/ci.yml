@@ -43,11 +43,10 @@ jobs:
       - if: always()
         run: docker rm -f bookstore-image || true
   compose:
-    env:
-      DJANGO_DEBUG: 'true'
     runs-on: ubuntu-latest
     needs: test
     env:
+      DJANGO_DEBUG: 'true'
       POSTGRES_PASSWORD: ci-ephemeral-postgres-only
     steps:
       - uses: actions/checkout@v4
