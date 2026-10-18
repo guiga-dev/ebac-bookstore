@@ -18,3 +18,9 @@ Testes: `python manage.py test`. Branch `codex/drf-auth` com PR base `codex/drf-
 `docker run --rm -p 127.0.0.1:8000:8000 ebac-bookstore:images`
 Consultar `/api/products/`. SQLite é descartável neste marco. Branch `codex/docker-image` base `codex/drf-auth`.
 Execução real da imagem depende de Docker Desktop e ainda precisa ser registrada.
+
+
+## Containers e PostgreSQL
+
+Copie `.env.example` para `.env`, escolha uma senha local e rode `docker compose up --build`. PostgreSQL é acessível apenas dentro da rede Compose. Os dados ficam em volume nomeado. O healthcheck aguarda o banco antes das migrações.
+Branch `codex/docker-compose`, base `codex/docker-image`.
