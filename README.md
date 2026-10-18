@@ -7,6 +7,6 @@ O baseline original das aulas não estava nos repositórios do usuário. Este pr
 Branch sugerida `codex/drf-setup`; PR base `main`. O marco preserva a página inicial Django e adiciona `rest_framework` a INSTALLED_APPS. Apenas desenvolvimento local.
 
 
-## Marco codex/drf-paginacao
+## Marco codex/drf-auth
 
-Testes: `python manage.py test`. Branch `codex/drf-paginacao` com PR base `codex/drf-viewsets`.
+Testes: `python manage.py test`. Branch `codex/drf-auth` com PR base `codex/drf-paginacao`.
