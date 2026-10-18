@@ -10,3 +10,11 @@ Branch sugerida `codex/drf-setup`; PR base `main`. O marco preserva a página in
 ## Marco codex/drf-auth
 
 Testes: `python manage.py test`. Branch `codex/drf-auth` com PR base `codex/drf-paginacao`.
+
+
+## Docker Images
+
+`docker build -t ebac-bookstore:images .`
+`docker run --rm -p 127.0.0.1:8000:8000 ebac-bookstore:images`
+Consultar `/api/products/`. SQLite é descartável neste marco. Branch `codex/docker-image` base `codex/drf-auth`.
+Execução real da imagem depende de Docker Desktop e ainda precisa ser registrada.
