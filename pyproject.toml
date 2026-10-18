@@ -12,3 +12,4 @@ djangorestframework = "3.16.1"
 django-debug-toolbar = "6.3.0"
 gunicorn = "26.2.0"
 psycopg = {version = "3.3.6", extras = ["binary"]}
+whitenoise = "6.12.0"

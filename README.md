@@ -36,5 +36,14 @@ Branch `codex/docker-network`, base `codex/docker-compose`.
 
 GitHub Actions executa checks, consistência de migrations, testes e build Docker. Workflow separado analisa erros de sintaxe/nome com Ruff e produz anotações de revisão. Recurso equivalente implementado; a aula solicita CodeFactor, cuja ligação à conta GitHub está pendente. Não declarar execução de Actions até o workflow rodar remotamente.
 Branch `codex/ci`, base `codex/docker-network`.
-`nA ferramenta de revisão solicitada na aula é CodeFactor. A integração requer conectar o repositório à conta CodeFactor/GitHub do usuário; etapa externa pendente. Ruff é uma verificação adicional e não substitui a declaração de integração ativa.
 
+
+## Continuous Delivery · Heroku
+
+Configurar no Heroku `DJANGO_SECRET_KEY` (valor privado aleatório), `DJANGO_ALLOWED_HOSTS=nome-do-app.herokuapp.com`, `DJANGO_DEBUG=false` e `DATABASE_URL` do PostgreSQL. O build instala `requirements.txt` e WhiteNoise serve estáticos. Procfile usa Gunicorn e migrações na fase release.
+
+No GitHub, configurar secrets `HEROKU_API_KEY`, `HEROKU_EMAIL` e variable `HEROKU_APP_NAME`. Após teste, o workflow entrega pushes em main ao app configurado. Primeira publicação: `git push heroku main`. Não incluir tokens no repositório.
+
+Local: `DJANGO_DEBUG=true python manage.py test`. Deploy público/URL e execução do pipeline aguardam conta/credenciais do provedor. Branch `codex/cd`, base `codex/ci`.
+
+CodeFactor é a ferramenta de revisão solicitada; conexão à conta GitHub pendente. Nenhum resultado remoto é alegado.

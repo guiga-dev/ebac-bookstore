@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: bookstore
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
       POSTGRES_HOST: db
+      DJANGO_DEBUG: 'true'
     networks:
       - bookstore_net
     depends_on:
@@ -34,3 +35,4 @@ volumes:
 networks:
   bookstore_net:
     driver: bridge
+
