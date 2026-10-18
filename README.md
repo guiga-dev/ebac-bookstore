@@ -24,3 +24,9 @@ Execução real da imagem depende de Docker Desktop e ainda precisa ser registra
 
 Copie `.env.example` para `.env`, escolha uma senha local e rode `docker compose up --build`. PostgreSQL é acessível apenas dentro da rede Compose. Os dados ficam em volume nomeado. O healthcheck aguarda o banco antes das migrações.
 Branch `codex/docker-compose`, base `codex/docker-image`.
+
+
+## Network
+
+Ambos os serviços usam a rede explícita `bookstore_net` com driver `bridge`. A aplicação resolve `db` pelo DNS do Compose e o PostgreSQL não publica porta no host.
+Branch `codex/docker-network`, base `codex/docker-compose`.

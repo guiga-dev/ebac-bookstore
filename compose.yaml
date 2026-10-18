@@ -8,6 +8,8 @@ services:
       POSTGRES_USER: bookstore
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
       POSTGRES_HOST: db
+    networks:
+      - bookstore_net
     depends_on:
       db:
         condition: service_healthy
@@ -17,6 +19,8 @@ services:
       POSTGRES_DB: bookstore
       POSTGRES_USER: bookstore
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+    networks:
+      - bookstore_net
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -26,3 +30,7 @@ services:
       retries: 10
 volumes:
   postgres_data:
+
+networks:
+  bookstore_net:
+    driver: bridge
