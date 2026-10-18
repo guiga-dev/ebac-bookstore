@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'development-only-not-for-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = __import__("os").getenv("DJANGO_DEBUG", "false").lower() == "true"
 
 ALLOWED_HOSTS = []
 
@@ -145,3 +145,24 @@ if os.getenv("POSTGRES_HOST"):
         "HOST": os.environ["POSTGRES_HOST"],
         "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }}
+
+# Configuração de produção via variáveis de ambiente do provedor.
+from urllib.parse import urlparse, unquote
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", SECRET_KEY if DEBUG else "")
+if not SECRET_KEY:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("Defina DJANGO_SECRET_KEY para produção")
+ALLOWED_HOSTS = [host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host not in ("localhost","127.0.0.1")]
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {"default": {"BACKEND":"django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND":"whitenoise.storage.CompressedManifestStaticFilesStorage"}}
+if os.getenv("DATABASE_URL"):
+    db = urlparse(os.environ["DATABASE_URL"])
+    DATABASES = {"default": {"ENGINE":"django.db.backends.postgresql", "NAME":db.path.lstrip("/"), "USER":unquote(db.username or ""), "PASSWORD":unquote(db.password or ""), "HOST":db.hostname, "PORT":db.port or 5432, "CONN_MAX_AGE":60, "OPTIONS":{"sslmode":"require"}}}
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
