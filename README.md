@@ -30,3 +30,11 @@ Branch `codex/docker-compose`, base `codex/docker-image`.
 
 Ambos os serviços usam a rede explícita `bookstore_net` com driver `bridge`. A aplicação resolve `db` pelo DNS do Compose e o PostgreSQL não publica porta no host.
 Branch `codex/docker-network`, base `codex/docker-compose`.
+
+
+## Integração contínua
+
+GitHub Actions executa checks, consistência de migrations, testes e build Docker. Workflow separado analisa erros de sintaxe/nome com Ruff e produz anotações de revisão. Recurso equivalente implementado; a aula solicita CodeFactor, cuja ligação à conta GitHub está pendente. Não declarar execução de Actions até o workflow rodar remotamente.
+Branch `codex/ci`, base `codex/docker-network`.
+`nA ferramenta de revisão solicitada na aula é CodeFactor. A integração requer conectar o repositório à conta CodeFactor/GitHub do usuário; etapa externa pendente. Ruff é uma verificação adicional e não substitui a declaração de integração ativa.
+
