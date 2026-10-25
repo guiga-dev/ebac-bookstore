@@ -166,3 +166,8 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
+
+# PythonAnywhere: valores privados configurados pelo operador no WSGI/ambiente.
+GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET", "")
+PYTHONANYWHERE_WSGI_FILE = os.getenv("PYTHONANYWHERE_WSGI_FILE", "")
+TEMPLATES[0]["DIRS"] = [BASE_DIR / "bookstore" / "templates"]
