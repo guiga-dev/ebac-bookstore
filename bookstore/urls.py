@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import include,path
+from .views import hello, update_server
 urlpatterns=[path("admin/",admin.site.urls),path("api/",include("product.urls")),path("api/",include("order.urls"))]
+urlpatterns += [path("hello/", hello, name="hello"), path("update_server/", update_server, name="update-server")]
 
 from django.conf import settings
 if settings.DEBUG:
