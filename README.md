@@ -1,49 +1,31 @@
-# Bookstore · configuração DRF
+# Bookstore — Continuous Delivery no PythonAnywhere
 
-Projeto novo em Python3.12, Django5.2LTS e DRF. Instalar com `poetry install`, migrar com `poetry run python manage.py migrate` e executar `poetry run python manage.py runserver`.
+Implementação local para o PDF atualizado do módulo: publicar a API no PythonAnywhere e receber notificações GitHub em `/update_server/`. A API Bookstore e seus endpoints anteriores foram preservados; `/hello/` renderiza `bookstore/templates/hello_world.html`.
 
-O baseline original das aulas não estava nos repositórios do usuário. Este projeto reconstrói a livraria com Product(name,price,description,active) conforme exemplo do material de apoio, Category(name,description) e Order(user,products,created_at). Category é FK de Product; Order tem múltiplos produtos e um dono. Os campos e relacionamentos adicionais são decisões explícitas desta implementação.
+## Estado atual
 
-Branch sugerida `codex/drf-setup`; PR base `main`. O marco preserva a página inicial Django e adiciona `rest_framework` a INSTALLED_APPS. Apenas desenvolvimento local.
+**Não publicado nem configurado no provedor.** A conta gratuita `guiga123434` já hospeda Trama e tem somente um webapp disponível. Não substituir nem modificar essa aplicação. Bookstore necessita outra conta/hospedagem autorizada antes da publicação. Este pacote não contém secrets nem comprovação de deploy online.
 
+## Preparação no provedor (somente quando houver conta separada)
 
-## Marco codex/drf-auth
+1. Clonar `https://github.com/guiga-dev/ebac-bookstore.git` em diretório próprio e usar a branch fixa `main` após revisão/merge. O checkout deve estar limpo.
+2. Criar virtualenv Python 3.12, instalar `requirements.txt`, executar migrações e `collectstatic`. Configurar um webapp Django manual, source directory e virtualenv na tela Web.
+3. No WSGI privado do PythonAnywhere, definir `DJANGO_SETTINGS_MODULE=bookstore.settings`, `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`, `DJANGO_ALLOWED_HOSTS` com o domínio exato e, se necessário, `DATABASE_URL`. Manter essas configurações fora do repositório.
+4. Definir também `GITHUB_WEBHOOK_SECRET` com valor aleatório privado e `PYTHONANYWHERE_WSGI_FILE` com o caminho absoluto do arquivo WSGI existente, por exemplo `/var/www/CONTA_pythonanywhere_com_wsgi.py` (substituir pelo arquivo real da conta Bookstore). O exemplo não é uma conta criada.
+5. Adicionar o diretório do checkout ao `sys.path` no WSGI e obter `application` com `django.core.wsgi.get_wsgi_application()`. Fazer o primeiro reload manual e conferir `/api/products/` e `/hello/`.
+6. Só então configurar webhook GitHub para `https://DOMINIO_REAL/update_server/`, JSON, evento push e o mesmo segredo privado. Nenhuma chave SSH de escrita é necessária para buscar o repositório público por HTTPS.
 
-Testes: `python manage.py test`. Branch `codex/drf-auth` com PR base `codex/drf-paginacao`.
+## Contrato do webhook
 
+- Apenas POST; HMAC SHA-256 obrigatório sobre o corpo original, validado em tempo constante pelo header `X-Hub-Signature-256`.
+- Ausência de segredo falha com 503; assinatura inválida, ref/repositório incorretos ou exclusão de branch não acionam atualização.
+- `ping` assinado retorna 200 sem deploy. Apenas `push` de `guiga-dev/ebac-bookstore`, ref exata `refs/heads/main`, é autorizado.
+- O trabalho começa numa thread com atraso curto; a resposta 202 informa **agendamento**, não conclusão. Isso permite responder antes do reload WSGI. Falhas posteriores ficam no error log do provedor. A thread não é uma fila persistente.
+- Comandos são listas fixas `subprocess.run(..., shell=False)`: verificar `main`, verificar checkout limpo, buscar o repositório fixo por HTTPS e aplicar somente fast-forward de `FETCH_HEAD`. Nenhum comando, caminho ou branch vem do payload.
+- Após sucesso, `os.utime` toca o arquivo WSGI existente definido na configuração privada. Sem reset destrutivo, comandos shell do payload ou instalação automática de dependências/migrações. Mudanças de dependências/esquema precisam de etapa operacional revisada.
 
-## Docker Images
+## Verificação local
 
-`docker build -t ebac-bookstore:images .`
-`docker run --rm -p 127.0.0.1:8000:8000 ebac-bookstore:images`
-Consultar `/api/products/`. SQLite é descartável neste marco. Branch `codex/docker-image` base `codex/drf-auth`.
-Execução real da imagem depende de Docker Desktop e ainda precisa ser registrada.
+Na raiz deste projeto, com `DJANGO_DEBUG=true`, executar `python manage.py test`. Os testes não acessam GitHub nem PythonAnywhere: mockam atualização, subprocessos, Timer e touch. Cobrem HMAC inválido, segredo ausente, ping, evento/ref/repositório incorretos, push autorizado, comandos fixos, branch local errada e template `/hello/`, além da suíte anterior do Bookstore.
 
-
-## Containers e PostgreSQL
-
-Copie `.env.example` para `.env`, escolha uma senha local e rode `docker compose up --build`. PostgreSQL é acessível apenas dentro da rede Compose. Os dados ficam em volume nomeado. O healthcheck aguarda o banco antes das migrações.
-Branch `codex/docker-compose`, base `codex/docker-image`.
-
-
-## Network
-
-Ambos os serviços usam a rede explícita `bookstore_net` com driver `bridge`. A aplicação resolve `db` pelo DNS do Compose e o PostgreSQL não publica porta no host.
-Branch `codex/docker-network`, base `codex/docker-compose`.
-
-
-## Integração contínua
-
-GitHub Actions executa checks, consistência de migrations, testes e build Docker. Workflow separado analisa erros de sintaxe/nome com Ruff e produz anotações de revisão. Recurso equivalente implementado; a aula solicita CodeFactor, cuja ligação à conta GitHub está pendente. Não declarar execução de Actions até o workflow rodar remotamente.
-Branch `codex/ci`, base `codex/docker-network`.
-
-
-## Continuous Delivery · Heroku
-
-Configurar no Heroku `DJANGO_SECRET_KEY` (valor privado aleatório), `DJANGO_ALLOWED_HOSTS=nome-do-app.herokuapp.com`, `DJANGO_DEBUG=false` e `DATABASE_URL` do PostgreSQL. O build instala `requirements.txt` e WhiteNoise serve estáticos. Procfile usa Gunicorn e migrações na fase release.
-
-No GitHub, configurar secrets `HEROKU_API_KEY`, `HEROKU_EMAIL` e variable `HEROKU_APP_NAME`. Após teste, o workflow entrega pushes em main ao app configurado. Primeira publicação: `git push heroku main`. Não incluir tokens no repositório.
-
-Local: `DJANGO_DEBUG=true python manage.py test`. Deploy público/URL e execução do pipeline aguardam conta/credenciais do provedor. Branch `codex/cd`, base `codex/ci`.
-
-CodeFactor é a ferramenta de revisão solicitada; conexão à conta GitHub pendente. Nenhum resultado remoto é alegado.
+O workflow Heroku foi removido. Os workflows existentes de CI/revisão continuam; nenhum secret, webhook, conta ou PR foi alterado remotamente nesta preparação. O PR existente é `https://github.com/guiga-dev/ebac-bookstore/pull/10`, branch `codex/cd`, base `codex/ci`; o agente principal decidirá a publicação da alteração.
