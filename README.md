@@ -4,7 +4,7 @@ Implementação local para o PDF atualizado do módulo: publicar a API no Python
 
 ## Estado atual
 
-**Não publicado nem configurado no provedor.** A conta gratuita `guiga123434` já hospeda Trama e tem somente um webapp disponível. Não substituir nem modificar essa aplicação. Bookstore necessita outra conta/hospedagem autorizada antes da publicação. Este pacote não contém secrets nem comprovação de deploy online.
+**Publicado:** https://guigaprimebixo.pythonanywhere.com/hello/ e API em /api/products/. Conta exclusiva guigaprimebixo, com Python 3.12, WSGI, HTTPS, DEBUG=false e SQLite persistente. Migrações e collectstatic concluídos em 25/10/2026. Testes: 21 locais e CI GitHub Actions aprovados. Webhook ainda desativado, aguardando ativação e teste real; não considerar comprovada a publicação automática.
 
 ## Preparação no provedor (somente quando houver conta separada)
 
