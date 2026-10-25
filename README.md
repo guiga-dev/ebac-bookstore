@@ -4,7 +4,7 @@ Implementação local para o PDF atualizado do módulo: publicar a API no Python
 
 ## Estado atual
 
-**Publicado:** https://guigaprimebixo.pythonanywhere.com/hello/ e API em /api/products/. Conta exclusiva guigaprimebixo, com Python 3.12, WSGI, HTTPS, DEBUG=false e SQLite persistente. Migrações e collectstatic concluídos em 25/10/2026. Testes: 21 locais e CI GitHub Actions aprovados. Webhook ainda desativado, aguardando ativação e teste real; não considerar comprovada a publicação automática.
+**Publicado:** https://guigaprimebixo.pythonanywhere.com/hello/ e API em /api/products/. Conta exclusiva guigaprimebixo, com Python 3.12, WSGI, HTTPS, DEBUG=false e SQLite persistente. Migrações e collectstatic concluídos em 25/10/2026. Testes: 21 locais e CI GitHub Actions aprovados. Webhook ativo (push/JSON/HTTPS/HMAC SHA256). Teste real em 25/10/2026: commit 5b22dd389b8f428a067c772ca1a879a58524c989 recebeu HTTP 202 e a nova mensagem apareceu em /hello/ sem pull/reload manual. Atividade enviada à EBAC e recebida para avaliação.
 
 ## Preparação no provedor (somente quando houver conta separada)
 
